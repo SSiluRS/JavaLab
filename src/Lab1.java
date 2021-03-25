@@ -22,6 +22,9 @@ public class Lab1 {
     static JTextField workCount = new JTextField("0");
     static JTextField warCount = new JTextField("0");
     static JTextField timeElapsed = new JTextField("0");
+    static JRadioButton rDrag = new JRadioButton("Drag");
+    static JRadioButton rStop = new JRadioButton("Stop");
+    static ButtonGroup bg=new ButtonGroup();
     static JDialog optionDialog;
     static Timer tSize = new Timer();
     static boolean isTSizeOn = false;
@@ -169,7 +172,7 @@ public class Lab1 {
             public void menuSelected(MenuEvent e) {
                 optionDialog  = new JDialog(jFrame, "Options");
                 Dimension dimension = drawPanel.getSize();
-                optionDialog.setBounds(dimension.width / 2 - 300 / 2 + jFrame.getX(), dimension.height / 2 - 200 / 2 + jFrame.getY(), 300, 200);
+                optionDialog.setBounds(dimension.width / 2 - 300 / 2 + jFrame.getX(), dimension.height / 2 - 200 / 2 + jFrame.getY(), 300, 300);
                 JPanel dialogPanel = new JPanel();
                 dialogPanel.setLayout(new BoxLayout(dialogPanel,1));
 
@@ -198,6 +201,10 @@ public class Lab1 {
                 antSpeed.setForeground(Color.BLUE);
                 antSpeed.setEditable(true);
                 dialogPanel.add(jpp2);
+
+                bg.add(rDrag); bg.add(rStop);
+                dialogPanel.add(rDrag);
+                dialogPanel.add(rStop);
 
                 optionDialog.add(dialogPanel);
                 optionDialog.setVisible(true);
@@ -423,9 +430,30 @@ public class Lab1 {
 
         drawPanel.addMouseListener(new MouseAdapter() {
             @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if(isStart && rStop.isSelected()){
+                    int n = drawPanel.ants.size();
+                    Ant ant;
+                    for (int i = 0; i < n; i++) {
+                        ant = drawPanel.ants.elementAt(i >= drawPanel.ants.size() ? i-- : i);
+                        if (ant.x1 < e.getX() && ant.x1 + 100 > e.getX() && ant.y1 < e.getY() && ant.y1 + 100 > e.getY()) {
+                            clickedAnt = ant;
+                            clickedAnt.isDragging = !clickedAnt.isDragging;
+                            System.out.println("Clicked");
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+
+        drawPanel.addMouseListener(new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
-                if(isStart) {
+                if(isStart && rDrag.isSelected()) {
                     int n = drawPanel.ants.size();
                     Ant ant;
                     for (int i = 0; i < n; i++) {
@@ -436,7 +464,7 @@ public class Lab1 {
                             isMousePressed = true;
                             X = e.getX();
                             Y = e.getY();
-                            System.out.println("Clicked");
+                            System.out.println("Pressed");
                             break;
                         }
                     }
@@ -451,6 +479,8 @@ public class Lab1 {
                 if (isMousePressed) {
                     clickedAnt.x1 += e.getX() - X;
                     clickedAnt.y1 += e.getY() - Y;
+                    if(clickedAnt.x1 < 0) clickedAnt.x1 = 0;
+                    if(clickedAnt.y1 < 0) clickedAnt.y1 = 0;
                     X = e.getX();
                     Y = e.getY();
                     drawPanel.repaint();
