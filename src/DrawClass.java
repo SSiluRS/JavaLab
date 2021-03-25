@@ -21,6 +21,7 @@ public class DrawClass extends JPanel {
     DrawClass(){
         String path = "resources/Murav.jpg";
         background = new ImageIcon(getClass().getResource(path));
+        Ant.speed = 1;
     }
 
     public void timerOn(){
@@ -33,6 +34,25 @@ public class DrawClass extends JPanel {
                 public void run() {
                     elapsedTime += 1;
                     lab1.timeElapsed.setText(String.valueOf(elapsedTime/1000));
+                    int n = ants.size();
+
+                    for (int i = 0; i< n; i++) {
+                        var ant = ants.elementAt(i);
+                        //System.out.println(ant.birth + " + " + WorkAnt.lifeTime + " <= " + elapsedTime);
+                        if (WorkAnt.lifeTime != 0)
+                            if (ant.type == 1 && ant.birth + WorkAnt.lifeTime <= elapsedTime) {
+                                ants.remove(i);
+                                n--;
+                                System.out.println("here1");
+                            }
+                        if (WarAnt.lifeTime != 0)
+                            if (ant.type == 2 && ant.birth + WarAnt.lifeTime <= elapsedTime) {
+                                ants.remove(i);
+                                n--;
+                                System.out.println("here2");
+                            }
+                    }
+                    repaint();
                 }
             };
             elapsedTimer.scheduleAtFixedRate(task,1, 1);
@@ -45,8 +65,6 @@ public class DrawClass extends JPanel {
     }
 
     public void draw() {
-
-
         Random rnd = new Random();
         if (timerWorkOn || timerWarOn) {
             timerWar.cancel();
@@ -77,13 +95,14 @@ public class DrawClass extends JPanel {
                     Random rndC = new Random();
                     int a = rndC.nextInt(100);
                     if (a <= chance) {
-                        ants.add(new WarAnt());
-                        ants.lastElement().x = rnd.nextInt(getWidth()-100);
-                        ants.lastElement().y = rnd.nextInt(getHeight()-127);
+                        var ant = new WarAnt(rnd.nextInt(getWidth()-100), rnd.nextInt(getHeight()-100), (int)(elapsedTime));
+
+
+                        ants.add(ant);
+                        System.out.println("War ant created in " + ant.birth);
                         Lab1.warCount.setText(String.valueOf(WarAnt.count));
                         repaint();
                     }
-                    System.out.println("Task is complete" + "\n");
                 }
             };
             timerWarOn = true;
@@ -111,13 +130,13 @@ public class DrawClass extends JPanel {
                     Random rndC = new Random();
                     int a = rndC.nextInt(100);
                     if (a <= chance) {
-                        ants.add(new WorkAnt());
-                        ants.lastElement().x = rnd.nextInt(getWidth()-100);
-                        ants.lastElement().y = rnd.nextInt(getHeight()-100);
+                        var ant = new WorkAnt(rnd.nextInt(getWidth()-100), rnd.nextInt(getHeight()-100), (int)(elapsedTime));
+
+                        System.out.println("Work ant created in " + ant.birth);
+                        ants.add(ant);
                         Lab1.workCount.setText(String.valueOf(WorkAnt.count));
                         repaint();
                     }
-                    System.out.println("Task1 is complete" + "\n");
                 }
             };
             timerWork.scheduleAtFixedRate(task1, Integer.parseInt(lab1.bornSec1.getText()), Integer.parseInt(lab1.bornSec1.getText()));
@@ -141,7 +160,7 @@ public class DrawClass extends JPanel {
         Graphics2D g2 = (Graphics2D)g;
         g2.drawImage(background.getImage(),0,0,lab1.drawPanel.getWidth(),lab1.drawPanel.getHeight(),null);
         for (Ant ant:ants) {
-            g2.drawImage(ant.image.getImage(),ant.x,ant.y,null);
+            g2.drawImage(ant.image.getImage(),(int) ant.x1,(int)ant.y1,null);
         }
     }
 }

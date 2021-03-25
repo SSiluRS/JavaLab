@@ -1,27 +1,32 @@
 import javax.sound.sampled.*;
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class Lab1 {
     static JFrame jFrame = getFrame();
     static JPanel jPanel = new JPanel();
     static DrawClass drawPanel = new DrawClass();
     static JTextField bornSec1 = new JTextField("1000",8);
+    static JTextField lifeSec1 = new JTextField("1000",8);
     static JTextField bornChance1 = new JTextField("30",8);
     static JTextField bornSec2 = new JTextField("5000",8);
+    static JTextField lifeSec2 = new JTextField("1000",8);
     static JTextField bornChance2 = new JTextField("50",8);
+    static JTextField antSpeed = new JTextField("1",8);
     static JTextField workCount = new JTextField("0");
     static JTextField warCount = new JTextField("0");
     static JTextField timeElapsed = new JTextField("0");
+    static JDialog optionDialog;
     static Timer tSize = new Timer();
     static boolean isTSizeOn = false;
     static boolean isHelp = false;
-
+    static Moving antMoving;
     private static int WHeight = 670;
     private static int WWidth = 1080;
 
@@ -43,6 +48,7 @@ public class Lab1 {
         bornSec1.setForeground(Color.RED);
         bornSec1.setEditable(false);
         jPanel1.add(jp1);
+
         jPanel1.add(new JLabel("Шанс появления рабочих:"));
         JPanel jp2 = new JPanel();
         jp2.add(bornChance1);
@@ -54,13 +60,13 @@ public class Lab1 {
         JPanel jPanel2 = new JPanel();
         jPanel2.setLayout(new GridLayout(4,1));
         jPanel2.add(new JLabel("Время появления военных:"));
-
         JPanel jp3 = new JPanel();
         jp3.add(bornSec2);
         bornSec2.setFont(new Font("Serif", Font.BOLD, 15));
         bornSec2.setForeground(Color.BLUE);
         bornSec2.setEditable(false);
         jPanel2.add(jp3);
+
         jPanel2.add(new JLabel("Шанс появления военных:"));
         JPanel jp4 = new JPanel();
         jp4.add(bornChance2);
@@ -137,7 +143,6 @@ public class Lab1 {
         paramPan.add(Box.createVerticalStrut(10));
         paramPan.add(infPanel);
 
-
         constraints.weighty = 0;
         constraints.gridy = 1;
         constraints.gridx = 6;
@@ -155,6 +160,115 @@ public class Lab1 {
         drawPanel.setBackground(Color.gray);
         jPanel.add(drawPanel,constraints);
 
+        var jMenuBar = new JMenuBar();
+        var jMenu = new JMenu("More options");
+        jMenuBar.add(jMenu);
+        jMenu.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                optionDialog  = new JDialog(jFrame, "Options");
+                Dimension dimension = drawPanel.getSize();
+                optionDialog.setBounds(dimension.width / 2 - 300 / 2 + jFrame.getX(), dimension.height / 2 - 200 / 2 + jFrame.getY(), 300, 200);
+                JPanel dialogPanel = new JPanel();
+                dialogPanel.setLayout(new BoxLayout(dialogPanel,1));
+
+                dialogPanel.add(Box.createVerticalStrut(10));
+
+                dialogPanel.add(new JLabel("Время жизни рабочих:"));
+                JPanel jpp = new JPanel();
+                jpp.add(lifeSec1);
+                lifeSec1.setFont(new Font("Serif", Font.BOLD, 15));
+                lifeSec1.setForeground(Color.BLUE);
+                lifeSec1.setEditable(true);
+                dialogPanel.add(jpp);
+
+                dialogPanel.add(new JLabel("Время жизни военных:"));
+                JPanel jpp1 = new JPanel();
+                jpp1.add(lifeSec2);
+                lifeSec2.setFont(new Font("Serif", Font.BOLD, 15));
+                lifeSec2.setForeground(Color.BLUE);
+                lifeSec2.setEditable(true);
+                dialogPanel.add(jpp1);
+
+                dialogPanel.add(new JLabel("Скорость движения муравьев:"));
+                JPanel jpp2 = new JPanel();
+                jpp2.add(antSpeed);
+                antSpeed.setFont(new Font("Serif", Font.BOLD, 15));
+                antSpeed.setForeground(Color.BLUE);
+                antSpeed.setEditable(true);
+                dialogPanel.add(jpp2);
+
+                optionDialog.add(dialogPanel);
+                optionDialog.setVisible(true);
+
+                optionDialog.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        super.windowClosing(e);
+                        int lifeTime = 0;
+                        try {
+                            lifeTime = Integer.parseInt(lifeSec1.getText());
+                        }
+                        catch (Exception ee){
+                            lifeTime = 0;
+                        }
+                        WorkAnt.lifeTime = lifeTime;
+
+                        try {
+                            lifeTime = Integer.parseInt(lifeSec2.getText());
+                        }
+                        catch (Exception ee){
+                            lifeTime = 0;
+                        }
+                        WarAnt.lifeTime = lifeTime;
+
+                        try {
+                            Ant.speed = Integer.parseInt(antSpeed.getText());
+                        }
+                        catch (Exception ee){
+                            Ant.speed = 0;
+                        }
+                    }
+                });
+
+                KeyListener checkText = new KeyAdapter() {
+                    @Override
+                    public void keyReleased(KeyEvent e) {
+                        super.keyReleased(e);
+
+                        int lifeTime = 0;
+                        try {
+                            lifeTime = Integer.parseInt(((JTextField)e.getSource()).getText());
+                            if (lifeTime < 0){
+                                lifeTime = 0;
+                                ((JTextField)e.getSource()).setText("0");
+                            }
+
+                        }
+                        catch (Exception ee){
+                            ((JTextField)e.getSource()).setText("");
+                        }
+                        System.out.println(((JTextField)e.getSource()).getText());
+                    }
+                };
+
+                lifeSec1.addKeyListener(checkText);
+                lifeSec2.addKeyListener(checkText);
+                antSpeed.addKeyListener(checkText);
+
+            }
+            @Override
+            public void menuDeselected(MenuEvent e) {
+
+            }
+            @Override
+            public void menuCanceled(MenuEvent e) {
+
+            }
+        });
+
+        jFrame.setJMenuBar(jMenuBar);
+
         helpBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -162,7 +276,7 @@ public class Lab1 {
                 JDialog dialog = new JDialog(jFrame, "About");
                 Dimension dimension = drawPanel.getSize();
                 dialog.setBounds(dimension.width / 2 - 300 / 2 + jFrame.getX(), dimension.height / 2 - 200 / 2 + jFrame.getY(), 300, 200);
-                JTextArea helpT = new JTextArea("Данное приложение разработано студентами   НГТУ АВТФ группы АВТ-943:",20,5);
+                JTextArea helpT = new JTextArea("Данное приложение разработано командой\n\"Мы пришли за едой\", состоящей из студентов   НГТУ АВТФ группы АВТ-943:\nСлепченко Вадим; \nЖирнов Никита",20,5);
                 JPanel textP = new JPanel();
                 BoxLayout layout = new BoxLayout(textP,BoxLayout.X_AXIS);
                 textP.setLayout(layout);
@@ -255,12 +369,12 @@ public class Lab1 {
                     infPanel.setVisible(infPanel.isVisible() ? false : true);
 
                     if (infPanel.isVisible()) {
-                        jFrame.setMinimumSize(new Dimension(500, 670));
-                        jFrame.setSize(jFrame.getWidth(), 670);
+                        jFrame.setMinimumSize(new Dimension(500, 700));
+                        jFrame.setSize(jFrame.getWidth(), 700);
                     }
                     else{
-                        jFrame.setMinimumSize(new Dimension(500, 470));
-                        jFrame.setSize(jFrame.getWidth(), 470);
+                        jFrame.setMinimumSize(new Dimension(500, 500));
+                        jFrame.setSize(jFrame.getWidth(), 500);
                     }
                 }
 
@@ -274,6 +388,9 @@ public class Lab1 {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!isStart) {
+                    antMoving = new Moving();
+                    antMoving.start();
+
                     isStart = true;
                     drawPanel.ants.clear();
                     WorkAnt.count = 0;
@@ -307,6 +424,7 @@ public class Lab1 {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (isStart) {
+                    antMoving.interrupt();
                     isStart = false;
                     drawPanel.timerStop();
                     if(isMusic.isSelected()) stopSound();
@@ -392,7 +510,7 @@ public class Lab1 {
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setTitle("Lab1");
         int WWidth = 1080;
-        int WHeight = 480;
+        int WHeight = 500;
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension dimension = toolkit.getScreenSize();
         jFrame.setBounds(dimension.width/2-WWidth/2,dimension.height/2-WHeight/2,WWidth,WHeight);
