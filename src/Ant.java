@@ -12,6 +12,7 @@ abstract public class Ant{
     int birth;
     int state = 0;
     static double speed;
+    boolean isDragging;
 }
 
 class WorkAnt extends Ant{
@@ -30,6 +31,7 @@ class WorkAnt extends Ant{
         count++;
         this.birth = birth;
         state = 0;
+        isDragging = false;
     }
     void getVel(){
         double h = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
@@ -53,5 +55,6 @@ class WarAnt extends Ant{
         count++;
         this.birth = birth;
         state = 0;
+        isDragging = false;
     }
 }

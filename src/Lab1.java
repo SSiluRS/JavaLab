@@ -26,14 +26,15 @@ public class Lab1 {
     static Timer tSize = new Timer();
     static boolean isTSizeOn = false;
     static boolean isHelp = false;
-    static Moving antMoving;
+    static Moving antMoving = new Moving();
     private static int WHeight = 670;
     private static int WWidth = 1080;
-
+    static boolean isMousePressed = false;
     static  boolean isStart = false;
-
+    static Ant clickedAnt;
+    static double X, Y;
     public static void main(String[] args){
-
+        antMoving.start();
         jFrame.add(jPanel);
         GridBagLayout gridBagLayout = new GridBagLayout();
         jPanel.setLayout(gridBagLayout);
@@ -388,8 +389,8 @@ public class Lab1 {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!isStart) {
-                    antMoving = new Moving();
-                    antMoving.start();
+
+                    antMoving.enable();
 
                     isStart = true;
                     drawPanel.ants.clear();
@@ -420,11 +421,62 @@ public class Lab1 {
             }
         });
 
+        drawPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+                if(isStart) {
+                    int n = drawPanel.ants.size();
+                    Ant ant;
+                    for (int i = 0; i < n; i++) {
+                        ant = drawPanel.ants.elementAt(i >= drawPanel.ants.size() ? i-- : i);
+                        if (ant.x1 < e.getX() && ant.x1 + 100 > e.getX() && ant.y1 < e.getY() && ant.y1 + 100 > e.getY()) {
+                            clickedAnt = ant;
+                            clickedAnt.isDragging = true;
+                            isMousePressed = true;
+                            X = e.getX();
+                            Y = e.getY();
+                            System.out.println("Clicked");
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+        drawPanel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                super.mouseDragged(e);
+                if (isMousePressed) {
+                    clickedAnt.x1 += e.getX() - X;
+                    clickedAnt.y1 += e.getY() - Y;
+                    X = e.getX();
+                    Y = e.getY();
+                    drawPanel.repaint();
+                }
+            }
+        });
+
+
+        drawPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+                if(isMousePressed) {
+                    isMousePressed = false;
+                    clickedAnt.x = clickedAnt.x1;
+                    clickedAnt.y = clickedAnt.y1;
+                    clickedAnt.isDragging = false;
+                }
+            }
+        });
+
         stopBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (isStart) {
-                    antMoving.interrupt();
+                    antMoving.disable();
                     isStart = false;
                     drawPanel.timerStop();
                     if(isMusic.isSelected()) stopSound();
@@ -483,7 +535,7 @@ public class Lab1 {
                 if(isLab2.isSelected()) {
                     int n = drawPanel.ants.size();
                     for(int i = 0; i<n;i++){
-                        if(drawPanel.ants.elementAt(i).x> drawPanel.getWidth() || drawPanel.ants.elementAt(i).y > drawPanel.getHeight()){
+                        if(drawPanel.ants.elementAt(i).x1> drawPanel.getWidth() || drawPanel.ants.elementAt(i).y1 > drawPanel.getHeight()){
                             if(drawPanel.ants.elementAt(i).type == 1){
                                 workCount.setText(String.valueOf(Integer.parseInt(workCount.getText())-1));
                                 WorkAnt.count--;
@@ -508,7 +560,7 @@ public class Lab1 {
         JFrame jFrame = new JFrame(){};
         jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jFrame.setTitle("Lab1");
+        jFrame.setTitle("Lab1-4");
         int WWidth = 1080;
         int WHeight = 500;
         Toolkit toolkit = Toolkit.getDefaultToolkit();

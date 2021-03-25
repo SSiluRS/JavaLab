@@ -43,12 +43,16 @@ public class DrawClass extends JPanel {
                             if (ant.type == 1 && ant.birth + WorkAnt.lifeTime <= elapsedTime) {
                                 ants.remove(i);
                                 n--;
+                                WorkAnt.count--;
+                                Lab1.workCount.setText(String.valueOf(WorkAnt.count));
                                 System.out.println("here1");
                             }
                         if (WarAnt.lifeTime != 0)
                             if (ant.type == 2 && ant.birth + WarAnt.lifeTime <= elapsedTime) {
                                 ants.remove(i);
                                 n--;
+                                WarAnt.count--;
+                                Lab1.warCount.setText(String.valueOf(WarAnt.count));
                                 System.out.println("here2");
                             }
                     }
@@ -159,8 +163,11 @@ public class DrawClass extends JPanel {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
         g2.drawImage(background.getImage(),0,0,lab1.drawPanel.getWidth(),lab1.drawPanel.getHeight(),null);
-        for (Ant ant:ants) {
-            g2.drawImage(ant.image.getImage(),(int) ant.x1,(int)ant.y1,null);
+        try{
+            for (Ant ant : ants) {
+                g2.drawImage(ant.image.getImage(), (int) ant.x1, (int) ant.y1, null);
+            }
         }
+        catch (Exception e){}
     }
 }

@@ -7,11 +7,19 @@ public class Moving extends Thread {
     private Vector<Ant> ants = DrawClass.ants;
     private Timer moveTimer;
     static boolean moveOn = false;
+    private boolean isEnabled = true;
+    public void disable(){
+        isEnabled = false;
+    }
+    public void enable(){
+        isEnabled = true;
+    }
 
     @Override
     public void run() {
         super.run();
-        if (!isInterrupted()) {
+        if (isEnabled) {
+            System.out.println("enabled");
             if (moveOn) {
                 moveTimer.cancel();
             } else {
@@ -22,7 +30,8 @@ public class Moving extends Thread {
                         if (!ants.isEmpty() && Ant.speed > 0) {
                             int n = ants.size();
                             for (int i = 0; i < n; i++) {
-                                var ant = ants.elementAt(i);
+                                var ant = ants.elementAt(i>=ants.size() ? i--: i);
+                                if(ant.isDragging == true) continue;
                                 if(ant.type == 1) {
                                     WorkAnt ant1 = (WorkAnt) ant;
                                     ant1.getVel();
@@ -48,7 +57,12 @@ public class Moving extends Thread {
                                 else{
                                     WarAnt ant1 = (WarAnt) ant;
                                     ant1.x1 = ant1.x + 100*Math.cos(ant1.angle);
+                                    if(ant1.x1+100 > Lab1.drawPanel.getWidth()) ant1.x1 = Lab1.drawPanel.getWidth()-100;
+                                    if(ant1.x1 < 0) ant1.x1 = 0;
                                     ant1.y1 = ant1.y + 100*Math.sin(ant1.angle);
+                                    if(ant1.y1+128 > Lab1.drawPanel.getHeight()) ant1.y1 = Lab1.drawPanel.getHeight()-128;
+                                    if(ant1.y1 < 0) ant1.y1 = 0;
+
                                     ant1.angle+=Ant.speed*0.01;
                                 }
                             }
