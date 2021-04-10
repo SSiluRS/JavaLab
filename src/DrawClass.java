@@ -18,13 +18,13 @@ public class DrawClass extends JPanel {
     boolean isClear = false;
     ImageIcon background;
 
-    DrawClass(){
+    DrawClass() {
         String path = "resources/Murav.jpg";
         background = new ImageIcon(getClass().getResource(path));
         Ant.speed = 1;
     }
 
-    public void timerOn(){
+    public void timerOn() {
         if (timerTimeOn) {
             elapsedTimer.cancel();
         } else {
@@ -33,10 +33,10 @@ public class DrawClass extends JPanel {
                 @Override
                 public void run() {
                     elapsedTime += 1;
-                    lab1.timeElapsed.setText(String.valueOf(elapsedTime/1000));
+                    lab1.timeElapsed.setText(String.valueOf(elapsedTime / 1000));
                     int n = ants.size();
 
-                    for (int i = 0; i< n; i++) {
+                    for (int i = 0; i < n; i++) {
                         var ant = ants.elementAt(i);
                         //System.out.println(ant.birth + " + " + WorkAnt.lifeTime + " <= " + elapsedTime);
                         if (WorkAnt.lifeTime != 0)
@@ -59,11 +59,11 @@ public class DrawClass extends JPanel {
                     repaint();
                 }
             };
-            elapsedTimer.scheduleAtFixedRate(task,1, 1);
+            elapsedTimer.scheduleAtFixedRate(task, 1, 1);
         }
     }
 
-    public void timerStop(){
+    public void timerStop() {
         elapsedTimer.cancel();
         elapsedTime = 0;
     }
@@ -84,7 +84,7 @@ public class DrawClass extends JPanel {
                     try {
                         chance = Integer.parseInt(lab1.bornChance2.getText());
 
-                        if (chance < 0){
+                        if (chance < 0) {
                             chance = 0;
                             lab1.bornChance2.setText("0");
                         }
@@ -92,14 +92,13 @@ public class DrawClass extends JPanel {
                             chance = 100;
                             lab1.bornChance2.setText("100");
                         }
-                    }
-                    catch (Exception e){
+                    } catch (Exception e) {
                         lab1.bornChance2.setText(String.valueOf(chance));
                     }
                     Random rndC = new Random();
                     int a = rndC.nextInt(100);
                     if (a <= chance) {
-                        var ant = new WarAnt(rnd.nextInt(getWidth()-100), rnd.nextInt(getHeight()-100), (int)(elapsedTime));
+                        var ant = new WarAnt(rnd.nextInt(getWidth() - 100), rnd.nextInt(getHeight() - 100), (int) (elapsedTime));
 
 
                         ants.add(ant);
@@ -119,7 +118,7 @@ public class DrawClass extends JPanel {
                     int chance = 30;
                     try {
                         chance = Integer.parseInt(lab1.bornChance1.getText());
-                        if (chance < 0){
+                        if (chance < 0) {
                             chance = 0;
                             lab1.bornChance1.setText("0");
                         }
@@ -127,14 +126,13 @@ public class DrawClass extends JPanel {
                             chance = 100;
                             lab1.bornChance1.setText("100");
                         }
-                    }
-                    catch (Exception e){
+                    } catch (Exception e) {
                         lab1.bornChance1.setText(String.valueOf(chance));
                     }
                     Random rndC = new Random();
                     int a = rndC.nextInt(100);
                     if (a <= chance) {
-                        var ant = new WorkAnt(rnd.nextInt(getWidth()-100), rnd.nextInt(getHeight()-100), (int)(elapsedTime));
+                        var ant = new WorkAnt(rnd.nextInt(getWidth() - 100), rnd.nextInt(getHeight() - 100), (int) (elapsedTime));
 
                         System.out.println("Work ant created in " + ant.birth);
                         ants.add(ant);
@@ -148,8 +146,8 @@ public class DrawClass extends JPanel {
         }
     }
 
-    public void stopDraw(){
-        if (timerWorkOn || timerWarOn){
+    public void stopDraw() {
+        if (timerWorkOn || timerWarOn) {
             timerWork.cancel();
             timerWar.cancel();
             timerWorkOn = false;
@@ -161,13 +159,13 @@ public class DrawClass extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D)g;
-        g2.drawImage(background.getImage(),0,0,lab1.drawPanel.getWidth(),lab1.drawPanel.getHeight(),null);
-        try{
+        Graphics2D g2 = (Graphics2D) g;
+        g2.drawImage(background.getImage(), 0, 0, lab1.drawPanel.getWidth(), lab1.drawPanel.getHeight(), null);
+        try {
             for (Ant ant : ants) {
                 g2.drawImage(ant.image.getImage(), (int) ant.x1, (int) ant.y1, null);
             }
+        } catch (Exception e) {
         }
-        catch (Exception e){}
     }
 }
